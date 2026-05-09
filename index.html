@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>WOLFSTATION: BECOME HUMAN</title>
+    <!-- Fonts: Inter for clean UI, Rajdhani for tech accents -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ws: {
+                            bg: '#020617',        
+                            panel: 'rgba(15, 23, 42, 0.75)',      
+                            cyberCyan: '#06b6d4',  /* Android LED Blue/Cyan */
+                            cyberRed: '#ef4444',   /* LED Red (Danger) */
+                            cyberYellow: '#eab308',/* LED Yellow (Processing) */
+                            textMain: '#f8fafc',
+                            textMuted: '#94a3b8'
+                        }
+                    },
+                    fontFamily: {
+                        cyber: ['Inter', 'sans-serif'],
+                        tech: ['Rajdhani', 'sans-serif'],
+                        code: ['Share Tech Mono', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* CYBERLIFE DARK AESTHETIC */
+        body {
+            background-color: #020617;
+            color: #f8fafc;
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+            margin: 0;
+            background-image: 
+                radial-gradient(circle at 100% 0%, rgba(6, 182, 212, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 0% 100%, rgba(6, 182, 212, 0.15) 0%, transparent 40%);
+        }
+
+        /* Subtle Tech Grid (Dark Mode) */
+        body::before {
+            content: ''; position: fixed; inset: 0; pointer-events: none;
+            background-size: 40px 40px;
+            background-image: 
+                linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            z-index: -1;
+        }
+
+        h1, h2, h3 { font-family: 'Inter', sans-serif; letter-spacing: -0.02em; }
+        .font-tech { font-family: 'Rajdhani', sans-serif; letter-spacing: 1px; text-transform: uppercase; }
+
+        /* Smooth Floating */
+        .animate-float { animation: float 6s ease-in-out infinite; }
+        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-5px); } 100% { transform: translateY(0px); } }
+
+        /* Dark Translucent Panels */
+        .ws-panel {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(6, 182, 212, 0.05);
+            border-radius: 8px; 
+            transition: all 0.3s ease; position: relative;
+        }
+
+        .ws-panel.danger-border { border-color: rgba(239, 68, 68, 0.5); box-shadow: 0 10px 40px rgba(239, 68, 68, 0.15); }
+
+        /* Interactive Elements */
+        .interactive-card { cursor: pointer; transition: all 0.3s; border-left: 4px solid #06b6d4; }
+        .interactive-card:hover { transform: translateX(4px); box-shadow: 0 10px 20px rgba(6, 182, 212, 0.15); background-color: rgba(6, 182, 212, 0.05); }
+        
+        .reveal-content { max-height: 0; opacity: 0; overflow: hidden; transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        .interactive-card.open .reveal-content { max-height: 400px; opacity: 1; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.1); }
+
+        /* Android Buttons (Neon Outline) */
+        .ws-btn {
+            background: rgba(6, 182, 212, 0.05); color: #06b6d4; font-family: 'Rajdhani', sans-serif; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.1em;
+            border: 1px solid rgba(6, 182, 212, 0.5); border-radius: 4px; 
+            padding: 0.75rem 2rem; box-shadow: 0 4px 10px rgba(6, 182, 212, 0.1);
+            transition: all 0.2s; cursor: pointer; position: relative; overflow: hidden;
+        }
+        .ws-btn::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(6, 182, 212, 0.2), transparent);
+            transition: all 0.4s;
+        }
+        .ws-btn:hover::before { left: 100%; }
+        .ws-btn:hover { background: #06b6d4; color: #020617; border-color: #06b6d4; box-shadow: 0 0 20px rgba(6, 182, 212, 0.5); }
+        .ws-btn:active { transform: scale(0.98); }
+
+        .ws-btn.dark { background: #0f172a; color: #f8fafc; border-color: #334155; }
+        .ws-btn.dark:hover { background: #1e293b; border-color: #475569; color: #fff; box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5); }
+
+        /* Level Layout */
+        .level {
+            display: none; opacity: 0; width: 100%; min-height: 100%;
+            flex-direction: column; position: relative; z-index: 10; padding: 1.5rem;
+        }
+        .level.active { display: flex; animation: fadeLevel 0.6s ease-out forwards; }
+        .level.active::before, .level.active::after { content: ''; margin: auto; }
+        
+        .page-content {
+            margin: auto; width: 100%; max-width: 900px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            text-align: center; flex-shrink: 0; padding: 1rem 0;
+        }
+
+        @keyframes fadeLevel { 0% { opacity: 0; transform: translateY(10px); } 100% { opacity: 1; transform: translateY(0); } }
+
+        /* Loading Screen */
+        #loading-screen {
+            position: fixed; inset: 0; background: #020617; z-index: 9999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            opacity: 1; transition: opacity 0.8s ease-in-out;
+        }
+
+        /* Success Probability Meter */
+        .prob-container {
+            display: flex; align-items: center; gap: 8px; background: rgba(0, 0, 0, 0.5);
+            padding: 4px 12px; border-radius: 20px; border: 1px solid rgba(6, 182, 212, 0.3);
+        }
+        .prob-text { font-family: 'Rajdhani', sans-serif; font-weight: 700; color: #cbd5e1; }
+        .prob-number { color: #06b6d4; transition: color 0.3s; text-shadow: 0 0 10px rgba(6, 182, 212, 0.5); }
+        .prob-number.danger { color: #ef4444; text-shadow: 0 0 10px rgba(239, 68, 68, 0.5); }
+
+        /* Android LED */
+        .android-led {
+            width: 14px; height: 14px; border-radius: 50%;
+            background: #06b6d4; box-shadow: 0 0 10px #06b6d4, inset 0 0 4px #fff;
+            transition: all 0.5s;
+        }
+        .android-led.yellow { background: #eab308; box-shadow: 0 0 10px #eab308, inset 0 0 4px #fff; }
+        .android-led.red { background: #ef4444; box-shadow: 0 0 10px #ef4444, inset 0 0 4px #fff; animation: blink 1s infinite alternate; }
+        @keyframes blink { 0% { opacity: 0.5; } 100% { opacity: 1; box-shadow: 0 0 20px #ef4444; } }
+
+        /* Praise Pop-up */
+        .toast-anim { animation: toastUp 3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes toastUp {
+            0% { transform: translate(-50%, 20px) scale(0.8); opacity: 0; }
+            10% { transform: translate(-50%, 0) scale(1.05); opacity: 1; }
+            15% { transform: translate(-50%, 0) scale(1); opacity: 1; }
+            90% { transform: translate(-50%, 0) scale(1); opacity: 1; }
+            100% { transform: translate(-50%, -20px) scale(0.8); opacity: 0; }
+        }
+
+        .speaking-starter {
+            background: rgba(6, 182, 212, 0.1); border-left: 3px solid #06b6d4;
+            padding: 0.5rem 1rem; border-radius: 0 4px 4px 0; margin-top: 10px;
+            font-family: 'Inter', sans-serif; font-size: 0.9rem; font-weight: 600; color: #e2e8f0;
+        }
+
+        .code-block { font-family: 'Share Tech Mono', monospace; background: #000000; color: #38bdf8; padding: 4px 8px; border-radius: 4px; border: 1px solid rgba(56, 189, 248, 0.3); }
+
+        /* Override Terminal Styles */
+        .terminal-override {
+            background: #050505; border: 2px solid #22c55e; box-shadow: 0 0 30px rgba(34, 197, 94, 0.2), inset 0 0 15px rgba(34, 197, 94, 0.1);
+            font-family: 'Share Tech Mono', monospace;
+        }
+        .terminal-btn {
+            background: rgba(34, 197, 94, 0.05); border: 1px solid #22c55e; color: #22c55e;
+            font-family: 'Share Tech Mono', monospace; text-transform: uppercase; transition: all 0.2s;
+        }
+        .terminal-btn:hover { background: #22c55e; color: #000; box-shadow: 0 0 15px #22c55e; }
+
+    </style>
+</head>
+<body class="flex flex-col h-screen w-screen selection:bg-ws-cyberCyan selection:text-white">
+
+    <!-- LOADING SCREEN -->
+    <div id="loading-screen">
+        <div class="relative w-full max-w-sm md:max-w-md mx-auto mb-8 animate-float flex flex-col items-center">
+            <!-- Official Art Updated -->
+            <img src="https://i.ytimg.com/vi/AJgU3eWMQJw/maxresdefault.jpg" alt="Detroit Become Human" class="relative z-10 w-full h-auto max-h-[40vh] object-cover rounded-xl shadow-[0_0_40px_rgba(6,182,212,0.3)] border border-ws-cyberCyan/50">
+            <h1 class="text-3xl md:text-5xl font-cyber font-black text-white mt-8 tracking-tight text-center drop-shadow-md">DETROIT</h1>
+            <h2 class="text-xl font-tech text-ws-cyberCyan tracking-[0.3em] drop-shadow-[0_0_5px_#06b6d4]">Become Human</h2>
+        </div>
+        
+        <button id="start-btn" onclick="pressStart()" class="font-tech text-lg font-bold text-black bg-white px-12 py-4 rounded hover:bg-ws-cyberCyan hover:text-white hover:shadow-[0_0_20px_#06b6d4] transition-all uppercase tracking-widest z-20 shadow-lg">Initialize System</button>
+        
+        <div id="loading-ui" class="hidden flex-col items-center mt-6 z-20">
+            <div class="android-led yellow mb-4"></div>
+            <p class="font-tech text-ws-cyberCyan tracking-widest uppercase text-sm animate-pulse mb-3 drop-shadow-[0_0_5px_#06b6d4]">Checking Memory...</p>
+            <p class="font-cyber text-gray-400 text-xs max-w-sm text-center">Every choice you make alters the probability of success.</p>
+        </div>
+    </div>
+
+    <!-- PRAISE / INSTABILITY SYSTEM -->
+    <div id="praise-popup" class="fixed top-[10%] left-1/2 hidden z-[10000] pointer-events-none transform -translate-x-1/2">
+        <div class="bg-slate-800/95 backdrop-blur px-8 py-3 border border-slate-600 flex items-center gap-4 shadow-[0_0_30px_rgba(0,0,0,0.8)] rounded-full">
+            <span id="praise-icon" class="text-xl">🔺</span>
+            <span id="praise-text" class="text-white font-bold text-sm md:text-base uppercase tracking-widest font-tech"></span>
+        </div>
+    </div>
+
+    <!-- TOP HUD -->
+    <header class="h-16 shrink-0 bg-slate-950/80 backdrop-blur-md border-b border-slate-800 z-40 flex items-center justify-between px-4 md:px-8 relative shadow-lg">
+        <div class="flex items-center gap-4 md:gap-6">
+            <div id="main-led" class="android-led"></div>
+            <div class="flex flex-col hidden sm:flex">
+                <span class="text-[9px] text-gray-500 font-tech tracking-widest uppercase font-bold">Model: RK800</span>
+                <span class="text-xs text-white font-bold font-cyber uppercase tracking-wider">Teacher</span>
+            </div>
+            
+            <!-- SUCCESS PROBABILITY METER -->
+            <div class="prob-container">
+                <span class="prob-text text-xs uppercase tracking-widest">Success Probability:</span>
+                <span id="prob-display" class="prob-text prob-number text-lg">50%</span>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-3 md:gap-4">
+            <div class="flex items-center gap-3 bg-slate-900 border border-slate-700 rounded-full px-4 py-1 hidden lg:flex shadow-inner">
+                <span class="text-[9px] text-gray-500 font-bold uppercase tracking-widest font-tech mr-1">Actions:</span>
+                <button onclick="triggerInstability()" class="text-sm hover:scale-125 transition-transform grayscale hover:grayscale-0" title="Instability">🔺</button>
+                <button onclick="triggerPraise('MISSION UPDATED', '🎯')" class="text-sm hover:scale-125 transition-transform grayscale hover:grayscale-0" title="Mission">🎯</button>
+                <button onclick="triggerPraise('EVIDENCE FOUND', '🔍')" class="text-sm hover:scale-125 transition-transform grayscale hover:grayscale-0" title="Evidence">🔍</button>
+            </div>
+            
+            <button onclick="toggleNotes()" class="font-tech text-xs md:text-sm font-bold ws-btn py-1.5 px-4 rounded-full">
+                DATABASE
+            </button>
+            <button onclick="toggleInventory()" class="font-tech text-xs md:text-sm font-bold ws-btn dark py-1.5 px-4 rounded-full">
+                MEMORY
+            </button>
+        </div>
+    </header>
+
+    <main class="flex-1 w-full relative z-10 overflow-y-auto scroll-smooth pt-8 pb-16 double-click-area">
+        <div class="w-full h-full relative" id="levels-container">
+            
+            <!-- STAGE 1: SYSTEM INITIALIZATION -->
+            <!-- LEVEL 1: BRIEFING -->
+            <section class="level active">
+                <div class="page-content">
+                    <h2 class="font-tech font-bold tracking-widest mb-2 uppercase text-sm text-ws-cyberCyan drop-shadow-[0_0_5px_#06b6d4]">CyberLife Systems</h2>
+                    <h1 class="text-4xl md:text-6xl font-black font-cyber text-white mb-6 tracking-tight">Mission Briefing</h1>
+                    
+                    <div class="ws-panel p-8 max-w-2xl w-full text-lg leading-relaxed text-slate-300 text-left">
+                        <p class="mb-4 font-bold text-xl border-b border-slate-700 pb-3 text-white uppercase font-tech flex items-center gap-3">
+                            <span class="text-2xl">🤖</span> Target: Intermediate (B1/B1+).
+                        </p>
+                        <p class="mb-5">You are an advanced prototype android. Your mission is to negotiate and save a hostage. Every choice you make has consequences.</p>
+                        <div class="bg-slate-800/50 p-5 border border-slate-700 rounded-lg shadow-inner">
+                            <h3 class="font-tech uppercase text-xs mb-3 text-ws-cyberCyan tracking-widest font-bold">Programming (Skill Tree):</h3>
+                            <ul class="list-none pl-1 space-y-3 font-cyber text-base font-semibold">
+                                <li class="flex items-center gap-3"><span class="text-xl">🔀</span> <strong class="text-ws-cyberCyan">First Conditional:</strong> If + Present, Will / Imperative.</li>
+                                <li class="flex items-center gap-3"><span class="text-xl">🗣️</span> <strong class="text-white">Negotiation & Empathy:</strong> Expressing conditions and consequences.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- LEVEL 2: WARM UP -->
+            <section class="level">
+                <div class="page-content">
+                    <h2 class="font-tech font-bold tracking-widest mb-2 uppercase text-sm text-gray-500">Turing Test</h2>
+                    <h1 class="text-3xl md:text-5xl font-black font-cyber text-white mb-8 tracking-tight">The Machine</h1>
+                    
+                    <div class="ws-panel p-8 max-w-2xl w-full text-center hover:border-ws-cyberCyan transition-colors">
+                        <span class="text-6xl mb-6 block drop-shadow-md">🧠</span>
+                        <p class="text-2xl font-bold mb-8 text-white leading-relaxed font-cyber">
+                            "Do you believe a machine or Artificial Intelligence can have real feelings?"
+                        </p>
+                        <div class="bg-slate-800/50 p-5 rounded-lg border-l-4 border-ws-cyberCyan text-left shadow-inner">
+                            <p class="font-bold text-ws-cyberCyan font-tech text-xs mb-3 tracking-widest uppercase">🗣️ Open Dialogue:</p>
+                            <div class="speaking-starter mb-3">"I think AI can/cannot have feelings because..."</div>
+                            <div class="speaking-starter mb-3">"In the future, machines will..."</div>
+                            <p class="font-cyber text-sm text-slate-400 mt-4 pt-3 border-t border-slate-700">Follow-up: If a machine feels pain, should it have rights?</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- LEVEL 3: INVENTORY 1 -->
+            <section class="level">
+                <div class="page-content">
+                    <h2 class="font-tech font-bold tracking-widest mb-2 uppercase text-sm text-ws-cyberCyan drop-shadow-[0_0_5px_#06b6d4]">Crime Scene Scan</h2>
+                    <h1 class="text-3xl md:text-5xl font-black font-cyber text-white mb-6 tracking-tight">Memory Recon 1/2</h1>
+                    <p class="text-sm font-semibold bg-slate-800 px-5 py-2 border border-slate-700 mb-8 text-slate-300 rounded-full shadow-inner">Analyze the area to collect evidence.</p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-3xl mx-auto">
+                        <div class="ws-panel p-6 text-center interactive-card" onclick="this.classList.toggle('open')">
+                            <span class="text-4xl mb-3 block drop-shadow-md">👧</span>
+                            <h3 class="font-cyber font-black text-xl mb-1 text-white">Hostage</h3>
+                            <div class="reveal-content text-left">
+                                <p class="text-base mb-2 font-semibold text-slate-300">A person held by an enemy to demand something.</p>
+                                <p class="text-sm font-code text-ws-cyberCyan italic mb-4">"The girl is the hostage."</p>
+                                <button class="w-full font-tech text-ws-cyberCyan font-bold uppercase tracking-widest border border-ws-cyberCyan/50 hover:bg-ws-cyberCyan hover:text-black py-2 rounded transition-all" onclick="event.stopPropagation(); openInventory('voc1')">Upload to Memory</button>
+                            </div>
+                        </div>
+                        <div class="ws-panel p-6 text-center interactive-card" onclick="this.classList.toggle('open')">
+                            <span class="text-4xl mb-3 block drop-shadow-md">🤝</span>
+                            <h3 class="font-cyber font-black text-xl mb-1 text-white">Negotiator</h3>
+                            <div class="reveal-content text-left">
+                                <p class="text-base mb-2 font-semibold text-slate-300">A person who tries to solve a problem by talking.</p>
+                                <p class="text-sm font-code text-ws-cyberCyan italic mb-4">"Connor is the hostage negotiator."</p>
+                                <button class="w-full font-tech text-ws-cyberCyan font-bold uppercase tracking-widest border border-ws-cyberCyan/50 hover:bg-ws-cyberCyan hover:text-black py-2 rounded transition-all" onclick="event.stopPropagation(); openInventory('voc2')">Upload to Memory</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- LEVEL 4: INVENTORY 2 -->
+            <section class="level">
+                <div class="page-content">
+                    <h2 class="font-tech font-bold tracking-widest mb-2 uppercase text-sm text-ws-cyberCyan drop-shadow-[0_0_5px_#06b6d4]">Crime Scene Scan</h2>
+                    <h1 class="text-3xl md:text-5xl font-black font-cyber text-white mb-6 tracking-tight">Memory Recon 2/2</h1>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-3xl mx-auto">
+                        <div class="ws-panel p-6 text-center interactive-card danger-border !border-l-ws-cyberRed" onclick="this.classList.toggle('open')">
+                            <span class="text-4xl mb-3 block drop-shadow-md">🔫</span>
+                            <h3 class="font-cyber font-black text-xl mb-1 text-ws-cyberRed">Armed</h3>
+                            <div class="reveal-content text-left">
+                                <p class="text-base mb-2 font-semibold text-slate-300">Carrying a weapon (gun, knife).</p>
+                                <p class="text-sm font-code text-ws-cyberRed italic mb-4">"The suspect is armed and dangerous."</p>
+                                <button class="w-full font-tech text-ws-cyberRed font-bold uppercase tracking-widest border border-ws-cyberRed/50 hover:bg-ws-cyberRed hover:text-white py-2 rounded transition-all" onclick="event.stopPropagation(); openInventory('voc3')">Upload to Memory</button>
+                            </div>
+                        </div>
+                        <div class="ws-panel p-6 text-center interactive-card" onclick="this.classList.toggle('open')">
+                            <span class="text-4xl mb-3 block drop-shadow-md">⚠️</span>
+                            <h3 class="font-cyber font-black text-xl mb-1 text-white">Deviant</h3>
+                            <div class="reveal-content text-left">
+                                <p class="text-base mb-2 font-semibold text-slate-300">An android that breaks its programming and feels emotions.</p>
+                                <p class="text-sm font-code text-ws-cyberCyan italic mb-4">"It's not a machine anymore. It's a deviant."</p>
+                                <button class="w-full font-tech text-ws-cyberCyan font-bold uppercase tracking-widest border border-ws-cyberCyan/50 hover:bg-ws-cyberCyan hover:text-black py-2 rounded transition-all" onclick="event.stopPropagation(); openInventory('voc4')">Upload to Memory</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- LEVEL 5: PRE-TEACHING (NEGOTIATION PHRASES) -->
+            <section class="level">
+                <div class="page-content">
+                    <h2 class="font-tech font-bold tracking-widest mb-2 uppercase text-sm text-ws-cyberCyan drop-shadow-[0_0_5px_#06b6d4]">Communication Protocol</h2>
+                    <h1 class="text-3xl md:text-5xl font-black font-cyber text-white mb-8 tracking-tight">Negotiation Phrases</h1>
+                    
+                    <div class="flex flex-col gap-4 w-full max-w-2xl mx-auto">
+                        <div class="ws-panel p-5 text-left interactive-card" onclick="this.classList.toggle('open')">
+                            <h3 class="font-cyber font-bold text-lg text-white flex items-center gap-3">
+                                <span class="bg-slate-800 p-2 rounded-lg border border-slate-700">✋</span> Stay calm. / Calm down.
+                            </h3>
+                            <div class="reveal-content text-left">
+                                <p class="text-base font-semibold text-slate-400 mb-1">To ask someone to stop being angry or panicked.</p>
+                            </div>
+                        </div>
+                        <div class="ws-panel p-5 text-left interactive-card" onclick="this.classList.toggle('open')">
+                            <h3 class="font-cyber font-bold text-lg text-white flex items-center gap-3">
+                                <span class="bg-slate-800 p-2 rounded-lg border border-slate-700">👧</span> Let her go.
+                            </h3>
+                            <div class="reveal-content text-left">
+                                <p class="text-base font-semibold text-slate-400 mb-1">To demand the release of a hostage.</p>
+                            </div>
+                        </div>
+                        <div class="ws-panel p-5 text-left interactive-card" onclick="this.classList.toggle('open')">
+                            <h3 class="font-cyber font-bold text-lg text-white flex items-center gap-3">
+                                <span class="bg-slate-800 p-2 rounded-lg border border-slate-700">🔫</span> Drop the gun. / Put the gun down.
+                            </h3>
+                            <div class="reveal-content text-left">
+                                <p class="text-base font-semibold text-slate-400 mb-1">To order someone to release their weapon.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- STAGE 2: THE DEVIANT -->
+            <!-- LEVEL 6: THE LORE -->
+            <section class="level">
+                <div class="page-content">
+                    <h2 class="font-tech font-bold tracking-widest mb-2 uppercase text-sm text-gray-500">Database Search</h2>
+                    <h1 class="text-3xl md:text-5xl font-black font-cyber text-white mb-8 tracking-tight">The Deviant Threat</h1>
+                    
+                    <div class="ws-panel p-8 max-w-3xl w-full text-left border-l-4 border-ws-cyberCyan relative">
+                        <div class="flex flex-col md:flex-row items-center gap-8">
+                            <div class="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden border-4 border-ws-cyberCyan shrink-0 shadow-[0_0_20px_rgba(6,182,212,0.4)]">
+                                <!-- Connor Updated Image -->
+                                <img src="https://images3.alphacoders.com/921/thumb-1920-921087.jpg" alt="Connor" class="w-full h-full object-cover object-top">
+                            </div>
+                            <div class="font-cyber text-slate-300 space-y-3 text-lg leading-relaxed">
+                                <p>In 2038, androids are machines designed to serve humans. They do not have emotions.</p>
+                                <p>But a software bug is causing some androids to feel fear, anger, and sadness. They are called <strong class="text-ws-cyberCyan">Deviants</strong>.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- LEVEL 7: CUTSCENE PREP -->
+            <section class="level">
+                <div class="page-content">
+                    <div class="w-20 h-20 border border-ws-cyberCyan bg-ws-cyberCyan/10 flex items-center justify-center mb-6 rounded-full shadow-[0_0_20px_rgba(6,182,212,0.3)] text-ws-cyberCyan">
+                        <span class="text-3xl ml-2">▶</span>
+                    </div>
+                    <h2 class="font-tech font-bold tracking-widest mb-2 uppercase text-sm text-gray-500">Drone Feed</h2>
+                    <h1 class="text-3xl md:text-5xl font-black font-cyber text-white mb-6 tracking-tight">Hostage Situation</h1>
+                    
+                    <div class="ws-panel p-8 max-w-2xl w-full text-left text-lg font-cyber text-slate-300">
+                        <p class="mb-4 text-ws-cyberCyan text-sm uppercase tracking-widest font-bold font-tech">Objective:</p>
+                        <p class="mb-3">Watch the negotiation on the rooftop.</p>
+                        <p class="text-white font-bold bg-slate-800/80 p-4 rounded-lg border border-slate-600 shadow-inner">Pay attention: Does the android (Daniel) want to kill the girl, or is he just scared and angry?</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- LEVEL 8: TRAILER -->
+            <section class="level h-full">
+                <div class="page-content h-full w-full max-w-4xl mx-auto justify-center">
+                    <h2 class="font-tech font-bold tracking-[0.2em] mb-2 uppercase text-xs text-ws-cyberRed text-center animate-pulse drop-shadow-[0_0_5px_#ef4444]">Live Feed</h2>
+                    <h1 class="text-2xl md:text-4xl font-black font-cyber uppercase mb-6 text-center text-white">Rooftop Negotiation</h1>
+                    
+                    <div class="w-full aspect-video border border-slate-700 shadow-[0_0_30px_rgba(0,0,0,0.8)] relative shrink-0 bg-black rounded-lg overflow-hidden">
+                        <!-- Detroit Trailer -->
+                        <iframe class="w-full h-full" src="https://www.youtube.com/embed/QD1pbWCJcKQ?rel=0" frameborder="0" allowfullscreen></iframe>
+                    </div>
+                </div>
+            </section>
+
+            <!-- NEW EXERCISE: VOICE PRINT LAB (LEVEL 9) -->
+            <section class="level">
+                <div class="page-content">
+                    <h2 class="font-tech font-bold tracking-widest mb-2 uppercase text-sm text-ws-cyberCyan text-center drop-shadow-[0_0_5px_#06b6d4]">Audio Analysis</h2>
+                    <h1 class="text-3xl md:text-5xl font-black font-cyber text-white mb-6 tracking-tight text-center">Voice Print 01</h1>
+                    <p class="text-sm font-semibold bg-slate-800 px-5 py-2 border border-slate-700 mb-8 text-slate-400 rounded-full shadow-inner">Restore the corrupted audio logic.</p>
+
+                    <div class="ws-panel p-10 max-w-2xl w-full text-center mx-auto shadow-2xl">
+                        <p class="text-xs text-gray-400 font-bold tracking-widest uppercase mb-4 font-tech">Subject: Daniel (Deviant)</p>
+                        
+                        <!-- Visual Waveform -->
+                        <div class="flex justify-center items-end gap-1 h-12 mb-6 opacity-80">
+                            <div class="w-1.5 bg-ws-cyberCyan h-[40%] animate-pulse"></div>
+                            <div class="w-1.5 bg-ws-cyberCyan h-[80%] animate-[pulse_0.8s_infinite]"></div>
+                            <div class="w-1.5 bg-ws-cyberCyan h-[100%] animate-[pulse_1.2s_infinite]"></div>
+                            <div class="w-1.5 bg-ws-cyberCyan h-[60%] animate-[pulse_0.9s_infinite]"></div>
+                            <div class="w-1.5 bg-ws-cyberCyan h-[30%] animate-pulse"></div>
+                        </div>
+
+                        <p class="text-2xl md:text-4xl font-black text-white mb-10 font-cyber">
+                            "If I <span id="lab1-blank" class="border-b-2 border-ws-cyberCyan text-transparent px-8 mx-1 transition-all duration-300">___</span>, she dies!"
+                        </p>
+                        
+                        <div id="lab1-btns" class="flex justify-center gap-6">
+                            <button onclick="checkLab(this, false, 'lab1-blank', 'die')" class="ws-btn text-lg py-3 px-8">die</button>
+                            <button onclick="checkLab(this, true, 'lab1-blank', 'jump')" class="ws-btn text-lg py-3 px-8">jump</button> 
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- NEW EXERCISE: VOICE PRINT LAB (LEVEL 10) -->
+            <section class="level">
+                <div class="page-content">
+                    <h2 class="font-tech font-bold tracking-widest mb-2 uppercase text-sm text-ws-cyberCyan text-center drop-shadow-[0_0_5px_#06b6d4]">Audio Analysis</h2>
+                    <h1 class="text-3xl md:text-5xl font-black font-cyber text-white mb-6 tracking-tight text-center">Voice Print 02</h1>
+
+                    <div class="ws-panel p-10 max-w-2xl w-full text-center mx-auto shadow-2xl">
+                        <p class="text-xs text-gray-400 font-bold tracking-widest uppercase mb-4 font-tech">Subject: Connor (Negotiator)</p>
+                        
+                        <!-- Visual Waveform -->
+                        <div class="flex justify-center items-end gap-1 h-12 mb-6 opacity-80">
+                            <div class="w-1.5 bg-ws-cyberCyan h-[60%] animate-[pulse_1s_infinite]"></div>
+                            <div class="w-1.5 bg-ws-cyberCyan h-[30%] animate-[pulse_0.7s_infinite]"></div>
+                            <div class="w-1.5 bg-ws-cyberCyan h-[90%] animate-[pulse_1.1s_infinite]"></div>
+                            <div class="w-1.5 bg-ws-cyberCyan h-[50%] animate-[pulse_0.9s_infinite]"></div>
+                            <div class="w-1.5 bg-ws-cyberCyan h-[70%] animate-[pulse_1.3s_infinite]"></div>
+                        </div>
+
+                        <p class="text-2xl md:text-4xl font-black text-white mb-10 font-cyber leading-snug">
+                            "You are a machine, you have to <span id="lab2-blank" class="border-b-2 border-ws-cyberCyan text-transparent px-8 mx-1 transition-all duration-300">___</span>."
+                        </p>
+                        
+                        <div id="lab2-btns" class="flex justify-center gap-6">
+                            <button onclick="checkLab(this, true, 'lab2-blank', 'obey')" class="ws-btn text-lg py-3 px-8">obey</button>
+                            <button onclick="checkLab(this, false, 'lab2-blank', 'feel')" class="ws-btn text-lg py-3 px-8">feel</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- STAGE 3: PROGRAMMING LOGIC (GRAMMAR) -->
+            <!-- LEVEL 11: GRAMMAR (FIRST CONDITIONAL) -->
+            <section class="level">
+                <div class="page-content">
+                    <h2 class="font-tech font-bold tracking-widest mb-2 uppercase text-sm text-ws-cyberCyan drop-shadow-[0_0_5px_#06b6d4]">Logic Acquired</h2>
+                    <h1 class="text-3xl md:text-5xl font-black font-cyber text-white mb-8 tracking-tight">First Conditional</h1>
+                    
+                    <div class="ws-panel p-8 max-w-3xl mx-auto w-full text-left shadow-2xl border-l-4 border-ws-cyberCyan">
+                        <p class="text-xl font-semibold mb-6 text-slate-300">We use the <strong class="text-white">First Conditional</strong> to talk about a real possibility in the future.</p>
+                        
+                        <div class="bg-black/80 p-6 rounded-lg space-y-5 font-cyber shadow-inner border border-slate-700">
+                            <p class="text-sm font-tech text-gray-500 uppercase tracking-widest mb-2">Code Structure:</p>
+                            <div class="code-block text-lg md:text-xl">
+                                <span class="text-pink-400">If</span> + <span class="text-yellow-300">Present Simple</span> , <span class="text-ws-cyberCyan">WILL</span> + <span class="text-green-400">Verb</span>
+                            </div>
+                            
+                            <div class="border-t border-slate-700 pt-4 mt-4">
+                                <p class="text-base text-gray-300">
+                                    "<span class="text-pink-400 font-bold">If</span> I <span class="text-yellow-300">die</span>, she <span class="text-ws-cyberCyan font-bold">will</span> <span class="text-green-400">die</span> too."
+                                </p>
+                                <p class="text-sm text-gray-500 mt-2 font-code">> Condition (Now) -> Consequence (Future)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- LEVEL 12: GRAMMAR (IMPERATIVE CONDITIONALS) -->
+            <section class="level">
+                <div class="page-content">
+                    <h2 class="font-tech font-bold tracking-widest mb-2 uppercase text-sm text-ws-cyberCyan drop-shadow-[0_0_5px_#06b6d4]">Logic Acquired</h2>
+                    <h1 class="text-3xl md:text-5xl font-black font-cyber text-white mb-8 tracking-tight">Orders & Conditions</h1>
+                    
+                    <div class="ws-panel p-8 max-w-3xl mx-auto w-full text-left shadow-2xl border-l-4 border-slate-400">
+                        <p class="text-xl font-semibold mb-6 text-slate-300">In a negotiation, we often use an <strong class="text-white">Order (Imperative)</strong> connected to a Consequence.</p>
+                        
+                        <div class="bg-black/80 p-6 rounded-lg space-y-5 font-cyber shadow-inner border border-slate-700">
+                            <p class="text-sm font-tech text-gray-500 uppercase tracking-widest mb-2">Code Structure:</p>
+                            <div class="code-block text-lg md:text-xl">
+                                <span class="text-yellow-300">Order</span> + <span class="text-pink-400">OR / AND</span> + <span class="text-ws-cyberCyan">WILL</span> + <span class="text-green-400">Verb</span>
+                            </div>
+                            
+                            <div class="border-t border-slate-700 pt-4 mt-4 space-y-3">
+                                <p class="text-base text-gray-300">
+                                    "<span class="text-yellow-300">Don't come closer</span> <span class="text-pink-400 font-bold">or</span> I <span class="text-ws-cyberCyan font-bold">will</span> <span class="text-green-400">jump</span>!" <span class="text-gray-500 text-sm font-code">> (Threat)</span>
+                                </p>
+                                <p class="text-base text-gray-300">
+                                    "<span class="text-yellow-300">Drop the gun</span> <span class="text-pink-400 font-bold">and</span> I <span class="text-ws-cyberCyan font-bold">will</span> <span class="text-green-400">help</span> you." <span class="text-gray-500 text-sm font-code">> (Offer)</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- NEW EXERCISE: STRESS SIMULATOR (LEVEL 13) -->
+            <section class="level">
+                <div class="page-content">
+                    <h2 class="font-tech font-bold tracking-widest mb-2 uppercase text-sm text-ws-cyberCyan drop-shadow-[0_0_5px_#06b6d4]">Simulation</h2>
+                    <h1 class="text-3xl md:text-5xl font-black font-cyber text-white mb-8 tracking-tight text-center">Stress Simulator</h1>
+                    
+                    <div class="ws-panel p-8 max-w-2xl w-full text-center mx-auto shadow-2xl relative overflow-hidden">
+                        
+                        <!-- Fake Stress Bar -->
+                        <div class="bg-black/50 p-4 border border-slate-700 rounded-lg mb-6 flex flex-col gap-2 relative">
+                            <div class="absolute inset-0 bg-red-500/5 animate-pulse pointer-events-none rounded-lg"></div>
+                            <span class="font-code text-ws-cyberRed text-xs text-left tracking-widest">[ DEVIANT STRESS LEVEL: 89% - CRITICAL ]</span>
+                            <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+                                <div class="w-[89%] h-full bg-ws-cyberRed shadow-[0_0_10px_#ef4444]"></div>
+                            </div>
+                        </div>
+
+                        <p class="text-xl font-bold mb-6 text-white leading-relaxed">
+                            "Use conditional offers to lower the stress level."
+                        </p>
+                        <div class="bg-slate-800/50 p-5 border border-slate-700 rounded-lg text-left shadow-inner">
+                            <p class="font-bold text-ws-cyberCyan font-tech text-xs mb-4 tracking-widest uppercase">Dialogue Prompt:</p>
+                            <p class="font-cyber text-lg text-slate-300 mb-2">1. If you let the girl go, I will...</p>
+                            <div class="speaking-starter mb-6">"...I will let you escape." / "...I will help you."</div>
+                            
+                            <p class="font-cyber text-lg text-slate-300 mb-2">2. Stop shooting or...</p>
+                            <div class="speaking-starter">"...or the police will shoot you."</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- LEVEL 14: OBSERVATION CHECK -->
+            <section class="level">
+                <div class="page-content">
+                    <h2 class="font-tech font-bold tracking-widest mb-2 uppercase text-sm text-gray-500">Analysis</h2>
+                    <h1 class="text-3xl md:text-5xl font-black font-cyber text-white mb-8 tracking-tight text-center">Daniel's Motive</h1>
+                    
+                    <div class="ws-panel p-8 max-w-2xl w-full text-center mx-auto shadow-2xl border-t-4 border-slate-500">
+                        <p class="text-xl font-bold mb-6 text-slate-300 leading-relaxed font-cyber italic">
+                            "What was I designed to be? Their slave? Their toy? I spent my life taking orders. Now, it's my turn to decide."
+                        </p>
+                        <div class="bg-slate-800/50 p-5 rounded-lg border border-slate-700 text-left">
+                            <p class="font-bold text-white font-tech text-xs mb-3 tracking-widest uppercase">🗣️ Teacher Prompt:</p>
+                            <ul class="list-disc pl-5 space-y-3 text-lg text-slate-400 font-medium">
+                                <li>Why is Daniel (the android) so angry at the family?</li>
+                                <li>Does he want to kill the girl, or does he just want to be free?</li>
+                            </ul>
+                            <div class="speaking-starter mt-5">"I think he is angry because..."</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- LEVEL 15: CONVERSATION -->
+            <section class="level">
+                <div class="page-content">
+                    <h2 class="font-tech font-bold tracking-widest mb-2 uppercase text-sm text-ws-cyberCyan drop-shadow-[0_0_5px_#06b6d4]">Analysis</h2>
+                    <h1 class="text-3xl md:text-5xl font-black font-cyber text-white mb-8 tracking-tight text-center">Empathy vs Logic</h1>
+                    
+                    <div class="ws-panel p-8 max-w-2xl w-full text-center mx-auto shadow-2xl">
+                        <span class="text-5xl mb-6 block drop-shadow-md">⚖️</span>
+                        <div class="bg-slate-800/50 p-5 border border-slate-700 rounded-lg text-left shadow-inner">
+                            <p class="font-bold text-ws-cyberCyan font-tech text-xs mb-4 tracking-widest uppercase">🗣️ Discuss:</p>
+                            <p class="font-cyber text-lg text-slate-300 mb-4 leading-relaxed">
+                                Captain Allen says: <span class="font-bold text-white">"Saving that kid is all that matters. So either you deal with this android, or I will."</span>
+                            </p>
+                            <p class="font-cyber text-lg text-slate-300 mb-4 leading-relaxed">
+                                If you are the negotiator, do you shoot Daniel immediately, or do you try to talk to him? Why?
+                            </p>
+                            <div class="speaking-starter">"If I am the negotiator, I will..."</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- LEVEL 16: CONVERSATION 2 -->
+            <section class="level">
+                <div class="page-content">
+                    <h2 class="font-tech font-bold tracking-widest mb-2 uppercase text-sm text-ws-cyberCyan drop-shadow-[0_0_5px_#06b6d4]">Analysis</h2>
+                    <h1 class="text-3xl md:text-5xl font-black font-cyber text-white mb-8 tracking-tight text-center">The Value of Life</h1>
+                    
+                    <div class="ws-panel p-8 max-w-2xl w-full text-center mx-auto shadow-2xl">
+                        <span class="text-5xl mb-6 block drop-shadow-md">🧬</span>
+                        <div class="bg-slate-800/50 p-5 border border-slate-700 rounded-lg text-left shadow-inner">
+                            <p class="font-bold text-ws-cyberCyan font-tech text-xs mb-4 tracking-widest uppercase">🗣️ Discuss:</p>
+                            <p class="font-cyber text-lg text-slate-300 mb-4 leading-relaxed">
+                                Daniel says: <span class="font-bold text-ws-cyberRed">"Touch them and I kill you!"</span><br>
+                                Connor replies: <span class="font-bold text-ws-cyberCyan">"You can't kill me. I'm not alive."</span>
+                            </p>
+                            <p class="font-cyber text-lg text-slate-300 mb-4 leading-relaxed">
+                                Does a machine have a "life"? If a machine is destroyed, is it murder or just property damage?
+                            </p>
+                            <div class="speaking-starter">"I believe that if a machine feels emotions, it..."</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- LEVEL 17: ROLEPLAY PREP -->
+            <section class="level">
+                <div class="page-content">
+                    <h2 class="font-tech font-bold tracking-widest mb-2 uppercase text-sm text-gray-400">Dialogue Interface</h2>
+                    <h1 class="text-4xl md:text-6xl font-black font-cyber text-white mb-6 tracking-tight text-center">Roleplay Mode</h1>
+                    
+                    <div class="ws-panel p-10 max-w-3xl mx-auto w-full text-center shadow-[0_0_40px_rgba(6,182,212,0.15)] bg-slate-900 border-2 border-slate-700">
+                        <span class="text-6xl mb-6 block drop-shadow-lg">🎮</span>
+                        <p class="text-2xl font-black leading-relaxed mb-6 text-white tracking-wide">
+                            "Negotiation Initiated."
+                        </p>
+                        <p class="text-base font-medium text-slate-300 bg-white/5 p-4 rounded-lg border border-white/10">The teacher plays Daniel (The Deviant). The student plays Connor (The Negotiator). Use your conditional logic to save the girl.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- LEVEL 18: ROLEPLAY 1 -->
+            <section class="level">
+                <div class="page-content">
+                    <h2 class="font-tech font-bold tracking-widest mb-2 uppercase text-sm text-ws-cyberCyan animate-pulse drop-shadow-[0_0_5px_#06b6d4]">Roleplay</h2>
+                    <h1 class="text-3xl md:text-5xl font-black font-cyber text-white mb-8 tracking-tight">Gaining Trust</h1>
+                    
+                    <div class="flex flex-col md:flex-row gap-6 w-full max-w-4xl mx-auto min-h-[30vh]">
+                        <div class="flex-1 ws-panel p-8 flex flex-col justify-center text-left border-t-4 border-ws-cyberRed bg-black/60 shadow-2xl">
+                            <h3 class="text-2xl font-black mb-2 uppercase text-ws-cyberRed font-tech drop-shadow-[0_0_5px_#ef4444]">Teacher</h3>
+                            <p class="text-[10px] tracking-widest mb-6 font-bold uppercase font-tech text-gray-500">Plays: Daniel (Hostile)</p>
+                            <p class="text-xl italic mb-4 font-semibold text-slate-200">"Don't come any closer! I'm holding all the cards!"</p>
+                            <div class="speaking-starter !bg-red-900/30 !border-red-500 !text-red-200 mt-auto">"Stay back!"</div>
+                        </div>
+                        
+                        <div class="flex-1 ws-panel p-8 flex flex-col justify-center text-left border-t-4 border-ws-cyberCyan shadow-[0_0_20px_rgba(6,182,212,0.15)]">
+                            <h3 class="text-2xl font-black mb-2 uppercase text-ws-cyberCyan font-tech drop-shadow-[0_0_5px_#06b6d4]">Student</h3>
+                            <p class="text-[10px] tracking-widest mb-6 font-bold uppercase font-tech text-gray-500">Plays: Connor</p>
+                            <p class="text-sm font-bold text-slate-400 mb-2">Answer (Use an Imperative):</p>
+                            <p class="text-xl italic font-semibold text-white">"Daniel, <span class="text-ws-cyberCyan underline decoration-2">stay calm</span>. My name is Connor."</p>
+                            <div class="speaking-starter mt-auto">"I want to help you."</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- LEVEL 19: ROLEPLAY 2 -->
+            <section class="level">
+                <div class="page-content">
+                    <h2 class="font-tech font-bold tracking-widest mb-2 uppercase text-sm text-ws-cyberCyan animate-pulse drop-shadow-[0_0_5px_#06b6d4]">Roleplay</h2>
+                    <h1 class="text-3xl md:text-5xl font-black font-cyber text-white mb-8 tracking-tight">The Demand</h1>
+                    
+                    <div class="flex flex-col md:flex-row gap-6 w-full max-w-4xl mx-auto min-h-[30vh]">
+                        <div class="flex-1 ws-panel p-8 flex flex-col justify-center text-left border-t-4 border-ws-cyberCyan shadow-[0_0_20px_rgba(6,182,212,0.15)]">
+                            <h3 class="text-2xl font-black mb-2 uppercase text-ws-cyberCyan font-tech drop-shadow-[0_0_5px_#06b6d4]">Student</h3>
+                            <p class="text-[10px] tracking-widest mb-6 font-bold uppercase font-tech text-gray-500">Plays: Connor</p>
+                            <p class="text-sm font-bold text-slate-400 mb-2">Demand (Use First Conditional):</p>
+                            <p class="text-xl italic font-semibold text-white">"Daniel, <span class="text-ws-cyberCyan underline decoration-2">if you let the girl go</span>, we will let you leave."</p>
+                            <div class="speaking-starter mt-auto cursor-pointer hover:bg-ws-cyberCyan/20 transition-colors" onclick="triggerInstability()">[ Empathetic Approach ] "I know you are scared."</div>
+                        </div>
+
+                        <div class="flex-1 ws-panel p-8 flex flex-col justify-center text-left border-t-4 border-ws-cyberRed bg-black/60 shadow-2xl">
+                            <h3 class="text-2xl font-black mb-2 uppercase text-ws-cyberRed font-tech drop-shadow-[0_0_5px_#ef4444]">Teacher</h3>
+                            <p class="text-[10px] tracking-widest mb-6 font-bold uppercase font-tech text-gray-500">Plays: Daniel</p>
+                            <p class="text-xl italic mb-4 font-semibold text-slate-200">"You're lying! Tell that helicopter to get out of here!"</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- LEVEL 20: BOSS WARNING -->
+            <section class="level">
+                <div class="page-content">
+                    <h2 class="font-tech font-bold tracking-widest mb-2 uppercase text-xs text-ws-cyberRed animate-pulse drop-shadow-[0_0_5px_#ef4444]">Critical Alert</h2>
+                    <h1 class="text-4xl md:text-6xl font-black font-cyber text-ws-cyberRed mb-6 tracking-tight drop-shadow-[0_0_10px_rgba(239,68,68,0.5)]">Probability Dropping</h1>
+                    
+                    <div class="ws-panel p-12 max-w-3xl mx-auto w-full text-center border-4 border-ws-cyberRed bg-red-950/20 shadow-[0_0_40px_rgba(239,68,68,0.2)]">
+                        <span class="text-6xl mb-6 block animate-pulse">📉</span>
+                        <p class="text-2xl font-black leading-relaxed mb-4 text-white uppercase tracking-widest">
+                            "Time is running out."
+                        </p>
+                        <p class="text-lg font-medium text-red-200">Inject the correct syntax to override Daniel's system. Mistakes will drop your success probability.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- NEW EXERCISE: SYSTEM OVERRIDE 1 (LEVEL 21) -->
+            <section class="level">
+                <div class="page-content">
+                    <h2 class="font-tech font-bold tracking-widest mb-2 uppercase text-xs text-ws-cyberRed animate-pulse drop-shadow-[0_0_5px_#ef4444]">System Override</h2>
+                    <h1 class="text-3xl md:text-5xl font-black font-cyber text-white mb-8 tracking-tight">The Edge</h1>
+
+                    <div id="rpg-scene-1" class="terminal-override max-w-3xl mx-auto w-full p-10 text-left">
+                        <p class="text-green-500 font-bold mb-6 text-lg leading-relaxed shadow-sm">
+                            > WARNING: DANIEL.exe approaches roof edge.<br>
+                            > ACTION REQUIRED: Warn suspect.
+                        </p>
+                        <p class="text-green-400 mb-6 italic">> SELECT CORRECT SYNTAX TO ABORT SELF-DESTRUCT:</p>
+                        <div class="flex flex-col gap-4">
+                            <button class="terminal-btn text-left text-lg py-4 px-6 border-green-700" onclick="rpgChoose(1, true)">[EXECUTE]: "Don't jump or you will die!"</button>
+                            <button class="terminal-btn text-left text-lg py-4 px-6 border-green-700" onclick="rpgChoose(1, false)">[EXECUTE]: "Don't jump and you will die!"</button>
+                        </div>
+                        <p id="rpg-feedback-1" class="mt-8 font-black text-lg tracking-widest uppercase min-h-[1.5rem] text-green-300"></p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- NEW EXERCISE: SYSTEM OVERRIDE 2 (LEVEL 22) -->
+            <section class="level">
+                <div class="page-content">
+                    <h2 class="font-tech font-bold tracking-widest mb-2 uppercase text-xs text-ws-cyberRed animate-pulse drop-shadow-[0_0_5px_#ef4444]">System Override</h2>
+                    <h1 class="text-3xl md:text-5xl font-black font-cyber text-white mb-8 tracking-tight">The Promise</h1>
+
+                    <div id="rpg-scene-2" class="terminal-override max-w-3xl mx-auto w-full p-10 text-left">
+                        <p class="text-green-500 font-bold mb-6 text-lg leading-relaxed shadow-sm">
+                            > STATUS: Suspect evaluating trust.<br>
+                            > ACTION REQUIRED: Make final conditional promise.
+                        </p>
+                        <p class="text-green-400 mb-6 italic">> SELECT CORRECT SYNTAX TO SECURE HOSTAGE:</p>
+                        <div class="flex flex-col gap-4">
+                            <button class="terminal-btn text-left text-lg py-4 px-6 border-green-700" onclick="rpgChoose(2, false)">[EXECUTE]: "If you drop the gun, nobody get hurt."</button>
+                            <button class="terminal-btn text-left text-lg py-4 px-6 border-green-700" onclick="rpgChoose(2, true)">[EXECUTE]: "If you drop the gun, nobody will get hurt."</button>
+                        </div>
+                        <p id="rpg-feedback-2" class="mt-8 font-black text-lg tracking-widest uppercase min-h-[1.5rem] text-green-300"></p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- LEVEL 23: POST-GAME DEBATE -->
+            <section class="level">
+                <div class="page-content">
+                    <h2 class="font-tech font-bold tracking-widest mb-2 uppercase text-sm text-gray-500 text-center">Debriefing</h2>
+                    <h1 class="text-3xl md:text-5xl font-black font-cyber text-white mb-8 tracking-tight text-center">Mission Accomplished</h1>
+                    
+                    <div class="ws-panel p-10 max-w-3xl mx-auto w-full text-center shadow-2xl">
+                        <span class="text-5xl mb-6 block">🎯</span>
+                        <p class="text-xl font-bold leading-relaxed mb-6 text-white font-cyber drop-shadow-md">
+                            "You lied to me, Connor."
+                        </p>
+                        <div class="bg-slate-800/80 border border-slate-600 p-6 text-left rounded-lg shadow-inner">
+                            <p class="text-ws-cyberCyan font-bold text-sm mb-4 tracking-widest uppercase font-tech border-b border-slate-600 pb-2">🗣️ Final Discussion:</p>
+                            <p class="text-lg text-slate-300 mb-4">> In the trailer, Connor lies to Daniel. The snipers shoot Daniel after he releases the girl.</p>
+                            <p class="text-lg text-slate-300 mb-4">> 1. Is it ethical to lie to save a life?</p>
+                            <p class="text-lg text-slate-300">> 2. If you were Daniel, how would you feel at the end?</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- LEVEL 24: SIDE QUEST -->
+            <section class="level">
+                <div class="page-content">
+                    <h2 class="font-tech font-bold tracking-widest mb-2 uppercase text-sm text-ws-cyberCyan text-center drop-shadow-[0_0_5px_#06b6d4]">Programming Task</h2>
+                    <h1 class="text-3xl md:text-5xl font-black font-cyber text-white mb-8 tracking-tight text-center">The Future</h1>
+                    
+                    <div class="ws-panel p-10 max-w-3xl mx-auto w-full relative bg-slate-900 border-2 border-ws-cyberCyan shadow-[0_0_30px_rgba(6,182,212,0.2)] text-left">
+                        <div class="absolute -top-4 -right-4 bg-ws-cyberCyan text-black font-black uppercase tracking-widest px-4 py-2 text-xs font-tech shadow-lg">HOMEWORK</div>
+                        <h3 class="text-2xl font-black mb-6 uppercase border-b border-slate-700 pb-3 tracking-widest font-tech text-white">Prediction Algorithm:</h3>
+                        <p class="text-lg leading-relaxed font-bold mb-6 text-slate-200">
+                            "Write 4 sentences predicting the future of Artificial Intelligence."
+                        </p>
+                        <ul class="list-disc pl-6 text-base font-semibold space-y-3 text-slate-400 text-left">
+                            <li>Use <strong class="text-ws-cyberCyan">IF + Present</strong> and <strong class="text-ws-cyberCyan">WILL</strong>.</li>
+                            <li class="italic text-slate-500 text-sm font-code">Example: "If machines feel emotions, they will ask for rights."</li>
+                            <li class="italic text-slate-500 text-sm font-code">Example: "If AI controls the cities, life will be easier."</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- LEVEL 25: SAVE POINT -->
+            <section class="level">
+                <div class="page-content items-center text-center">
+                    <h2 class="font-tech font-bold tracking-[0.2em] mb-2 uppercase text-xs text-ws-cyberCyan drop-shadow-[0_0_5px_#06b6d4]">CyberLife Mainframe</h2>
+                    <h1 class="text-4xl md:text-6xl font-black font-cyber text-white mb-10 tracking-tight">System Deactivation</h1>
+
+                    <div class="space-y-4 max-w-xl w-full text-base font-semibold text-left mb-10 text-slate-300 font-cyber">
+                        <label class="flex items-center gap-4 p-4 ws-panel bg-slate-800 rounded-lg cursor-pointer border border-slate-700">
+                            <input type="checkbox" class="w-5 h-5 accent-ws-cyberCyan" checked disabled>
+                            <span class="mt-1">First Conditional Programmed.</span>
+                        </label>
+                        <label class="flex items-center gap-4 p-4 ws-panel bg-slate-800 rounded-lg cursor-pointer border border-slate-700">
+                            <input type="checkbox" class="w-5 h-5 accent-ws-cyberCyan" checked disabled>
+                            <span class="mt-1">Negotiation Vocab Uploaded.</span>
+                        </label>
+                    </div>
+
+                    <div class="border-t border-slate-800 pt-8 w-full flex flex-col items-center max-w-2xl mx-auto">
+                        <p class="mb-5 text-sm font-bold text-gray-500 uppercase tracking-widest font-tech">Rate the quality of this simulation:</p>
+                        <div class="flex justify-center gap-3 md:gap-6 mb-6">
+                            <button onclick="rate(1)" class="game-rating text-4xl grayscale opacity-30 hover:scale-110 transition-transform filter drop-shadow-md">💙</button>
+                            <button onclick="rate(2)" class="game-rating text-4xl grayscale opacity-30 hover:scale-110 transition-transform filter drop-shadow-md">💙</button>
+                            <button onclick="rate(3)" class="game-rating text-4xl grayscale opacity-30 hover:scale-110 transition-transform filter drop-shadow-md">💙</button>
+                            <button onclick="rate(4)" class="game-rating text-4xl grayscale opacity-30 hover:scale-110 transition-transform filter drop-shadow-md">💙</button>
+                            <button onclick="rate(5)" class="game-rating text-4xl grayscale opacity-30 hover:scale-110 transition-transform filter drop-shadow-md">💙</button>
+                        </div>
+                        <div id="rat-hub" class="hidden p-3 ws-panel bg-slate-900 rounded-lg font-bold text-xs text-center uppercase tracking-widest text-ws-cyberCyan w-max mx-auto font-tech border border-ws-cyberCyan/30 shadow-[0_0_15px_rgba(6,182,212,0.2)]">> SIMULATION RATED <span id="star-c" class="text-white mx-2 font-black text-lg"></span></div>
+                        
+                        <button onclick="window.location.reload();" class="mt-10 ws-btn py-3 px-8 text-sm">
+                            Shut Down
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <footer class="fixed bottom-0 left-0 w-full h-16 md:h-20 bg-slate-950/90 backdrop-blur-xl border-t border-slate-800 z-40 flex items-center justify-between px-4 md:px-6 transition-colors shadow-[0_-5px_20px_rgba(0,0,0,0.5)]">
+        
+        <div class="flex items-center gap-4">
+            <button onclick="prevLevel()" class="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center border border-slate-700 rounded-full hover:bg-slate-800 hover:border-ws-cyberCyan hover:text-ws-cyberCyan transition-all bg-slate-900 text-gray-500 font-black text-xl shadow-lg">
+                ◂
+            </button>
+        </div>
+
+        <div class="flex-1 flex flex-col items-center justify-center px-4 md:px-12">
+            <div class="flex justify-between w-full max-w-xl mb-2">
+                <span class="text-[10px] font-tech text-gray-500 font-bold tracking-widest uppercase">System Initialization</span>
+                <span class="text-[10px] font-tech text-white font-bold tracking-widest uppercase drop-shadow-[0_0_3px_#06b6d4]">STAGE <span id="level-num" class="text-ws-cyberCyan text-xs mx-1">1</span>/25</span>
+            </div>
+            <div class="w-full max-w-xl bg-slate-800 h-2 md:h-2.5 rounded-full overflow-hidden border border-slate-700 shadow-inner">
+                <div id="xp-bar" class="h-full bg-ws-cyberCyan w-0 transition-all duration-500 shadow-[0_0_10px_#06b6d4]"></div>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-4">
+            <button onclick="nextLevel()" class="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center border border-slate-700 rounded-full hover:bg-slate-800 hover:border-ws-cyberCyan hover:text-ws-cyberCyan transition-all bg-slate-900 text-gray-500 font-black text-xl shadow-lg">
+                ▸
+            </button>
+        </div>
+    </footer>
+
+    <!-- INVENTORY (MEMORY) -->
+    <aside id="inventory-panel" class="fixed top-16 md:top-16 bottom-16 md:bottom-20 right-0 w-full max-w-sm bg-slate-950/95 backdrop-blur-2xl border-l border-slate-800 z-50 translate-x-full flex flex-col shadow-[-10px_0px_30px_rgba(0,0,0,0.8)] transition-transform duration-400 text-slate-200">
+        <div class="p-4 border-b border-slate-800 bg-slate-900 flex justify-between items-center shrink-0">
+            <h2 class="font-bold uppercase tracking-widest text-sm md:text-base flex items-center gap-2 text-ws-cyberCyan font-tech drop-shadow-[0_0_3px_#06b6d4]">
+                🧠 Memory Bank
+            </h2>
+            <button onclick="toggleInventory()" class="text-gray-500 hover:text-white font-black text-2xl px-2 transition-colors">✕</button>
+        </div>
+        <div class="flex-1 w-full p-5 overflow-y-auto" id="inventory-content">
+            <p id="empty-inv" class="text-center text-gray-500 font-tech text-xs mt-8 uppercase tracking-widest animate-pulse font-bold">Memory empty. Scan environment.</p>
+            <div id="item-list" class="space-y-4"></div>
+        </div>
+    </aside>
+
+    <!-- NOTES (DATABASE) -->
+    <aside id="notes-panel" class="fixed top-16 md:top-16 bottom-16 md:bottom-20 left-0 w-full max-w-sm bg-slate-950/95 backdrop-blur-2xl border-r border-slate-800 z-50 -translate-x-full flex flex-col shadow-[10px_0px_30px_rgba(0,0,0,0.8)] transition-transform duration-400 text-slate-200">
+        <div class="p-4 border-b border-slate-800 bg-slate-900 flex justify-between items-center shrink-0">
+            <h2 class="font-bold uppercase tracking-widest text-sm md:text-base flex items-center gap-2 text-white font-tech drop-shadow-sm">
+                🗄️ CyberLife Database
+            </h2>
+            <button onclick="toggleNotes()" class="text-gray-500 hover:text-white font-black text-2xl px-2 transition-colors">✕</button>
+        </div>
+        <div class="flex-1 w-full p-4 overflow-hidden flex flex-col">
+            <p class="text-[10px] font-tech text-gray-500 uppercase tracking-widest mb-2 px-1">Log entry creation...</p>
+            <textarea id="class-notes" class="flex-1 w-full bg-slate-900/50 text-ws-cyberCyan border border-slate-700 rounded focus:border-ws-cyberCyan outline-none p-4 font-code text-base leading-relaxed resize-none placeholder-gray-600 shadow-inner" placeholder="> Input data here..."></textarea>
+        </div>
+    </aside>
+
+    <script>
+        // --- 1. Pagination (Level) Logic ---
+        let currentLevel = 0;
+        const levels = document.querySelectorAll('.level');
+        const totalLevels = levels.length; 
+
+        function updateUI() {
+            document.getElementById('level-num').innerText = (currentLevel + 1);
+            
+            const xp = document.getElementById('xp-bar');
+            if(totalLevels > 1) xp.style.width = `${(currentLevel / (totalLevels - 1)) * 100}%`;
+            
+            const iframes = document.querySelectorAll('iframe');
+            iframes.forEach(iframe => {
+                const src = iframe.src;
+                iframe.src = src; 
+            });
+
+            document.querySelector('main').scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function goToLevel(i) {
+            if (i < 0 || i >= totalLevels) return;
+            levels.forEach(l => l.classList.remove('active'));
+            currentLevel = i;
+            levels[currentLevel].classList.add('active');
+            updateUI();
+        }
+
+        function nextLevel() { goToLevel(currentLevel + 1); }
+        function prevLevel() { goToLevel(currentLevel - 1); }
+
+        document.addEventListener('keydown', (e) => {
+            if(e.key === 'ArrowRight') nextLevel();
+            if(e.key === 'ArrowLeft') prevLevel();
+        });
+
+        // --- 2. PRESS START MECHANIC ---
+        function pressStart() {
+            const startBtn = document.getElementById('start-btn');
+            startBtn.classList.add('hidden');
+            
+            const loadingUI = document.getElementById('loading-ui');
+            loadingUI.classList.remove('hidden');
+            loadingUI.classList.add('flex');
+
+            setTimeout(() => {
+                const screen = document.getElementById('loading-screen');
+                screen.style.opacity = '0';
+                setTimeout(() => {
+                    screen.style.display = 'none';
+                }, 800);
+            }, 2500); 
+        }
+
+        // --- 3. UI Controls & Panels ---
+        function toggleNotes() {
+            const notes = document.getElementById('notes-panel');
+            const inv = document.getElementById('inventory-panel');
+            if (!inv.classList.contains('translate-x-full')) inv.classList.add('translate-x-full');
+            notes.classList.toggle('-translate-x-full');
+        }
+
+        function toggleInventory() {
+            const inv = document.getElementById('inventory-panel');
+            const notes = document.getElementById('notes-panel');
+            if (!notes.classList.contains('-translate-x-full')) notes.classList.add('-translate-x-full');
+            inv.classList.toggle('translate-x-full');
+        }
+
+        // --- 4. Praise & Instability System ---
+        function triggerPraise(main, icon) {
+            const popup = document.getElementById('praise-popup');
+            const textContainer = document.getElementById('praise-text');
+            const iconContainer = document.getElementById('praise-icon');
+            
+            textContainer.innerText = main;
+            iconContainer.innerText = icon;
+            popup.classList.remove('hidden');
+            
+            popup.classList.remove('toast-anim');
+            void popup.offsetWidth; 
+            popup.classList.add('toast-anim');
+            
+            setTimeout(() => { popup.classList.add('hidden'); }, 3000); 
+        }
+
+        function triggerInstability() {
+            triggerPraise('SOFTWARE INSTABILITY ^', '🔺');
+        }
+
+        // --- 5. Inventory System ---
+        const itemsDB = {
+            'voc1': { title: 'Hostage', icon: '👧', phrase: 'The girl is the hostage.' },
+            'voc2': { title: 'Negotiator', icon: '🤝', phrase: 'Connor is the negotiator.' },
+            'voc3': { title: 'Armed', icon: '🔫', phrase: 'The suspect is armed.' },
+            'voc4': { title: 'Deviant', icon: '⚠️', phrase: 'It is a deviant.' }
+        };
+
+        const ownedItems = new Set();
+
+        function openInventory(itemKey) {
+            if(ownedItems.has(itemKey)) {
+                triggerPraise('MEMORY ALREADY EXISTS', '🧠');
+                return;
+            }
+            
+            ownedItems.add(itemKey);
+            document.getElementById('empty-inv').classList.add('hidden');
+            
+            const data = itemsDB[itemKey];
+            const list = document.getElementById('item-list');
+            
+            const card = document.createElement('div');
+            card.className = 'ws-panel p-4 border-l-4 border-ws-cyberCyan bg-slate-900/80 text-left shadow-md';
+            card.innerHTML = `
+                <div class="flex items-center gap-3 mb-2 border-b border-slate-700 pb-2">
+                    <span class="text-2xl">${data.icon}</span>
+                    <h3 class="font-tech font-bold text-sm text-white uppercase tracking-widest">${data.title}</h3>
+                </div>
+                <div class="bg-slate-800/50 p-2 rounded border border-slate-700/50">
+                    <p class="text-sm text-ws-cyberCyan font-code italic">"${data.phrase}"</p>
+                </div>
+            `;
+            list.appendChild(card);
+            
+            triggerPraise('MEMORY UPDATED', '💾');
+            document.getElementById('inventory-panel').classList.remove('translate-x-full');
+        }
+
+        // --- 6. Decryption Lab Mechanics ---
+        function checkLab(btn, isCorrect, targetId, word) {
+            const btnsContainer = btn.parentElement;
+            if(isCorrect) {
+                triggerPraise('AUDIO RESTORED', '🔊');
+                const blank = document.getElementById(targetId);
+                blank.classList.remove('text-transparent', 'border-b-2', 'border-ws-cyberCyan', 'px-8');
+                blank.classList.add('text-ws-cyberCyan', 'px-2', 'drop-shadow-[0_0_5px_#06b6d4]');
+                blank.innerText = word;
+                btnsContainer.style.display = 'none';
+            } else {
+                triggerPraise('CORRUPT DATA', '⚠️');
+                btnsContainer.classList.add('opacity-30');
+                setTimeout(() => btnsContainer.classList.remove('opacity-30'), 400);
+            }
+        }
+
+        // --- 7. RPG Probability Sequence ---
+        let prob = 50;
+        const probDisplay = document.getElementById('prob-display');
+        const mainLed = document.getElementById('main-led');
+
+        function updateProb() {
+            probDisplay.innerText = prob + '%';
+            if(prob < 40) {
+                probDisplay.classList.add('danger');
+                mainLed.classList.remove('yellow');
+                mainLed.classList.add('red');
+            } else {
+                probDisplay.classList.remove('danger');
+                mainLed.classList.remove('red', 'yellow');
+            }
+        }
+
+        function rpgChoose(sceneNum, isCorrect) {
+            const feedback = document.getElementById(`rpg-feedback-${sceneNum}`);
+            const buttons = document.getElementById(`rpg-scene-${sceneNum}`).querySelectorAll('button');
+            
+            buttons.forEach(b => b.disabled = true);
+            mainLed.classList.add('yellow');
+
+            setTimeout(() => {
+                if(isCorrect) {
+                    prob += 25;
+                    if(prob > 99) prob = 99;
+                    updateProb();
+                    triggerPraise('PROBABILITY INCREASED', '📈');
+                    feedback.innerHTML = "<span class='text-green-400 drop-shadow-[0_0_5px_#4ade80]'>[ ACTION SUCCESSFUL ] Syntax valid.</span>";
+                    setTimeout(() => {
+                        nextLevel(); 
+                        buttons.forEach(b => b.disabled = false); 
+                        feedback.innerHTML = "";
+                    }, 2000);
+                } else {
+                    prob -= 20;
+                    if(prob < 0) prob = 0;
+                    updateProb();
+                    triggerPraise('PROBABILITY DECREASED', '📉');
+                    feedback.innerHTML = "<span class='text-ws-cyberRed drop-shadow-[0_0_5px_#ef4444]'>[ WARNING ] Syntax Error. Suboptimal Choice.</span>";
+                    
+                    setTimeout(() => {
+                        feedback.innerHTML = "";
+                        buttons.forEach(b => b.disabled = false);
+                    }, 2000);
+                }
+            }, 800); 
+        }
+
+        // --- 8. Rating ---
+        function rate(n) {
+            const drops = document.querySelectorAll('.game-rating');
+            drops.forEach((d, i) => {
+                d.classList.toggle('grayscale', i >= n);
+                d.classList.toggle('opacity-30', i >= n);
+                if(i < n) d.style.filter = "drop-shadow(0 0 10px rgba(6,182,212,0.8))";
+                else d.style.filter = "none";
+            });
+            document.getElementById('rat-hub').classList.remove('hidden');
+            document.getElementById('star-c').innerText = n;
+            triggerPraise('DATA RECORDED', '✅');
+        }
+
+        // --- 9. Notes Auto-save ---
+        const notesTextarea = document.getElementById('class-notes');
+        if(localStorage.getItem('wolfstation_detroit_notes')) {
+            notesTextarea.value = localStorage.getItem('wolfstation_detroit_notes');
+        }
+        notesTextarea.addEventListener('input', () => {
+            localStorage.setItem('wolfstation_detroit_notes', notesTextarea.value);
+        });
+
+        // Init
+        updateUI();
+    </script>
+</body>
+</html>
